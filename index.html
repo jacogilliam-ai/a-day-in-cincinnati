@@ -1,0 +1,932 @@
+<title>Willow in Cincinnati</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Libre+Caslon+Display&family=Karla:wght@400;500;600&display=swap">
+
+<style>
+  :root {
+    color-scheme: light;
+    --paper: #F6EEDF;
+    --paper-2: #EDE2CB;
+    --ink: #241C12;
+    --ink-soft: #6B5B47;
+    --rust: #96401F;
+    --terra: #BE5E33;
+    --sage: #76856A;
+    --sage-deep: #55644A;
+    --rule: rgba(36, 28, 18, 0.16);
+    --display: "Libre Caslon Display", "Iowan Old Style", Georgia, serif;
+    --body: "Karla", "Helvetica Neue", Arial, sans-serif;
+  }
+
+  * { box-sizing: border-box; }
+
+  body {
+    margin: 0;
+    background: var(--paper);
+    color: var(--ink);
+    font-family: var(--body);
+    font-size: 17px;
+    line-height: 1.56;
+    -webkit-font-smoothing: antialiased;
+    -webkit-text-size-adjust: 100%;
+    overflow-x: hidden;
+  }
+
+  .grain {
+    position: fixed;
+    inset: 0;
+    z-index: 0;
+    pointer-events: none;
+    opacity: 0.09;
+    mix-blend-mode: multiply;
+    background-image:
+      url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='180' height='180'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.86' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='180' height='180' filter='url(%23n)'/%3E%3C/svg%3E");
+  }
+
+  .laid {
+    position: fixed;
+    inset: 0;
+    z-index: 0;
+    pointer-events: none;
+    opacity: 0.4;
+    background-image: repeating-linear-gradient(
+      to bottom,
+      rgba(36, 28, 18, 0.028) 0 1px,
+      transparent 1px 5px
+    );
+  }
+
+  .page {
+    position: relative;
+    z-index: 1;
+    max-width: 37.5rem;
+    margin: 0 auto;
+    padding: 0 22px 70px;
+  }
+
+  /* ---------- opening ---------- */
+
+  .open { padding: 56px 0 4px; }
+
+  .eyebrow {
+    margin: 0 0 16px;
+    font-size: 0.78rem;
+    font-weight: 600;
+    letter-spacing: 0.17em;
+    text-transform: uppercase;
+    color: var(--rust);
+  }
+
+  .open h1 {
+    margin: 0;
+    font-family: var(--display);
+    font-weight: 400;
+    font-size: clamp(2.4rem, 12vw, 3.6rem);
+    line-height: 1.04;
+    letter-spacing: -0.018em;
+    text-wrap: balance;
+    text-shadow: 0 1px 0 rgba(255, 252, 244, 0.7);
+  }
+
+  .open .lede {
+    margin: 18px 0 0;
+    max-width: 30ch;
+    color: var(--ink-soft);
+    font-size: 1.07rem;
+  }
+
+  /* ---------- the plate ---------- */
+
+  .atlas {
+    margin: 36px -22px 0;
+    padding: 0;
+  }
+
+  .plate-title {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin: 0 22px 12px;
+    font-family: var(--display);
+    font-size: 0.8rem;
+    font-weight: 500;
+    letter-spacing: 0.26em;
+    text-transform: uppercase;
+    color: var(--sage-deep);
+  }
+
+  .plate-title::before,
+  .plate-title::after {
+    content: "";
+    flex: 1;
+    height: 1px;
+    background: var(--rule);
+  }
+
+  .map { display: block; width: 100%; height: auto; }
+
+  /* map ink */
+  .frame { fill: none; stroke: var(--ink); opacity: 0.4; }
+  .frame rect:first-child { stroke-width: 1.3; }
+  .frame rect:last-child { stroke-width: 0.6; }
+
+  .park-wash { fill: var(--sage); opacity: 0.09; }
+  .park-edge { fill: none; stroke: var(--sage-deep); stroke-width: 0.9; stroke-dasharray: 4 3.5; opacity: 0.3; }
+  .water-wash { fill: var(--sage); opacity: 0.07; }
+  .ky-wash { fill: var(--ink); opacity: 0.035; }
+
+  .streets { fill: none; stroke: var(--ink); stroke-width: 0.9; opacity: 0.13; }
+  .water { fill: none; stroke: var(--sage); stroke-width: 1.1; }
+  .bank { fill: none; stroke: var(--sage); stroke-width: 1.5; opacity: 0.7; }
+  .furniture { fill: none; stroke: var(--ink); stroke-width: 1.1; opacity: 0.5; }
+
+  .route {
+    fill: none;
+    stroke: var(--rust);
+    stroke-width: 2.1;
+    stroke-linecap: round;
+    stroke-dasharray: 1.4 6.5;
+    opacity: 0.26;
+    transition: opacity 0.4s ease;
+  }
+
+  .route.is-done { opacity: 1; }
+
+  .mlabel {
+    font-family: var(--display);
+    font-weight: 400;
+    font-size: 13px;
+    letter-spacing: 0.2em;
+    fill: var(--sage-deep);
+    stroke: var(--paper);
+    stroke-width: 3.4;
+    paint-order: stroke;
+  }
+
+  .mlabel.minor {
+    font-size: 12px;
+    letter-spacing: 0.16em;
+    opacity: 0.72;
+  }
+
+  .mlabel.tiny {
+    font-family: var(--body);
+    font-size: 12px;
+    letter-spacing: 0.1em;
+    opacity: 0.6;
+  }
+
+  .rose { fill: var(--ink); opacity: 0.34; }
+  .rose-ring { fill: none; stroke: var(--ink); stroke-width: 0.8; opacity: 0.35; }
+  .bar-on { fill: var(--ink); opacity: 0.4; }
+  .bar-off { fill: none; stroke: var(--ink); stroke-width: 0.9; opacity: 0.4; }
+
+  .pin { cursor: pointer; }
+  .pin-hit { fill: transparent; }
+  .pin-shadow { fill: var(--ink); opacity: 0.1; }
+  .pin-disc {
+    fill: var(--paper);
+    stroke: var(--rust);
+    stroke-width: 1.7;
+    transition: fill 0.3s ease, stroke 0.3s ease;
+  }
+  .pin-ring {
+    fill: none;
+    stroke: var(--rust);
+    stroke-width: 0.7;
+    opacity: 0.45;
+  }
+  .pin-num {
+    font-family: var(--display);
+    font-size: 15px;
+    font-weight: 400;
+    fill: var(--rust);
+    text-anchor: middle;
+    pointer-events: none;
+    transition: fill 0.3s ease;
+  }
+  .pin.mystery .pin-disc { stroke: var(--sage-deep); stroke-dasharray: 3.5 3; }
+  .pin.mystery .pin-ring { stroke: var(--sage-deep); }
+  .pin.mystery .pin-num { fill: var(--sage-deep); }
+  .pin.is-active .pin-disc { fill: var(--rust); stroke: var(--rust); }
+  .pin.is-active .pin-num { fill: var(--paper); }
+  .pin.mystery.is-active .pin-disc { fill: var(--sage-deep); stroke: var(--sage-deep); }
+  .pin:focus { outline: none; }
+  .pin:focus-visible .pin-ring { stroke-width: 2.4; opacity: 1; }
+
+  /* ---------- stepper ---------- */
+
+  .stepper {
+    margin: 0 22px;
+    padding-top: 16px;
+    border-top: 1px solid var(--rule);
+  }
+
+  .cap-kicker {
+    margin: 0;
+    font-size: 0.76rem;
+    font-weight: 600;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    color: var(--rust);
+  }
+
+  .cap-title {
+    margin: 5px 0 0;
+    font-family: var(--display);
+    font-weight: 400;
+    font-size: 1.42rem;
+    line-height: 1.16;
+    letter-spacing: -0.01em;
+  }
+
+  .cap-where {
+    margin: 3px 0 0;
+    font-size: 0.95rem;
+    color: var(--ink-soft);
+  }
+
+  .nav {
+    display: grid;
+    grid-template-columns: 1fr auto 1fr;
+    align-items: center;
+    gap: 8px;
+    margin-top: 16px;
+  }
+
+  .step-btn {
+    min-height: 46px;
+    padding: 0 14px;
+    border: 1.3px solid var(--rule);
+    border-radius: 2px;
+    background: none;
+    font-family: var(--body);
+    font-size: 0.92rem;
+    font-weight: 500;
+    letter-spacing: 0.04em;
+    color: var(--ink);
+    cursor: pointer;
+    transition: background 0.2s ease, border-color 0.2s ease, opacity 0.2s ease;
+  }
+
+  .step-btn.back { justify-self: start; }
+  .step-btn.next { justify-self: end; }
+
+  .step-btn:disabled {
+    opacity: 0.32;
+    cursor: default;
+  }
+
+  .step-btn:focus-visible {
+    outline: 2px solid var(--rust);
+    outline-offset: 3px;
+  }
+
+  .counter {
+    font-family: var(--display);
+    font-size: 0.92rem;
+    letter-spacing: 0.14em;
+    color: var(--ink-soft);
+    font-variant-numeric: tabular-nums;
+  }
+
+  @media (hover: hover) {
+    .step-btn:hover:not(:disabled) { background: var(--paper-2); border-color: var(--terra); }
+    .pin:hover .pin-disc { fill: var(--paper-2); }
+  }
+
+  /* ---------- stops ---------- */
+
+  .stops {
+    margin: 52px 0 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  .stop {
+    display: grid;
+    grid-template-columns: 44px 1fr;
+    column-gap: 16px;
+  }
+
+  .rail { display: flex; flex-direction: column; align-items: center; }
+
+  .num {
+    flex: none;
+    width: 40px;
+    height: 40px;
+    display: grid;
+    place-items: center;
+    font-family: var(--display);
+    font-size: 1.7rem;
+    font-weight: 400;
+    color: var(--rust);
+    line-height: 1;
+  }
+
+  .thread {
+    width: 1.6px;
+    flex: 1;
+    min-height: 24px;
+    margin: 4px 0;
+    background-image: linear-gradient(var(--sage) 50%, transparent 0);
+    background-size: 1.6px 9px;
+    background-repeat: repeat-y;
+    background-position: center;
+  }
+
+  .stop:last-child .thread { display: none; }
+
+  .col { padding-bottom: 38px; }
+  .stop:last-child .col { padding-bottom: 10px; }
+
+  .head {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding-top: 13px;
+  }
+
+  .head .hr { flex: 1; height: 1px; background: var(--rule); }
+
+  .head .when {
+    font-size: 0.74rem;
+    font-weight: 600;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    color: var(--sage-deep);
+    white-space: nowrap;
+  }
+
+  .titleline {
+    display: grid;
+    grid-template-columns: 1fr 42px;
+    align-items: start;
+    column-gap: 12px;
+    margin-top: 8px;
+  }
+
+  .stop h2 {
+    margin: 0;
+    font-family: var(--display);
+    font-weight: 400;
+    font-size: 1.34rem;
+    line-height: 1.18;
+    letter-spacing: -0.008em;
+    text-wrap: balance;
+  }
+
+  .doodle { width: 42px; height: 42px; color: var(--terra); }
+  .stop:nth-child(odd) .doodle { transform: rotate(2.5deg); }
+  .stop:nth-child(even) .doodle { transform: rotate(-2deg); }
+
+  .note {
+    margin: 9px 0 0;
+    max-width: 36ch;
+    color: var(--ink-soft);
+  }
+
+  .spots {
+    margin: 10px 0 0;
+    font-size: 0.88rem;
+    font-weight: 500;
+    letter-spacing: 0.02em;
+    color: var(--rust);
+  }
+
+  /* ---------- lunch picker ---------- */
+
+  .picker { margin-top: 16px; }
+
+  .picker-label {
+    margin: 0 0 10px;
+    font-size: 0.76rem;
+    font-weight: 600;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--rust);
+  }
+
+  .vibes {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 8px;
+  }
+
+  .vibe {
+    min-height: 58px;
+    padding: 9px 11px;
+    border: 1.3px solid var(--rule);
+    border-radius: 2px;
+    background: none;
+    font-family: var(--body);
+    font-size: 1rem;
+    font-weight: 500;
+    line-height: 1.22;
+    color: var(--ink);
+    text-align: left;
+    cursor: pointer;
+    transition: background 0.2s ease, border-color 0.2s ease, color 0.2s ease;
+  }
+
+  .vibe-wide { grid-column: 1 / -1; }
+
+  .vibe span {
+    display: block;
+    margin-top: 3px;
+    font-size: 0.79rem;
+    font-weight: 400;
+    color: var(--ink-soft);
+    transition: color 0.2s ease;
+  }
+
+  .vibe[aria-pressed="true"] {
+    background: var(--rust);
+    border-color: var(--rust);
+    color: var(--paper);
+  }
+
+  .vibe[aria-pressed="true"] span { color: rgba(246, 238, 223, 0.8); }
+
+  .vibe:focus-visible { outline: 2px solid var(--rust); outline-offset: 3px; }
+
+  @media (hover: hover) {
+    .vibe:hover { border-color: var(--terra); }
+    .vibe[aria-pressed="true"]:hover { border-color: var(--rust); }
+  }
+
+  .picked {
+    margin: 14px 0 0;
+    padding-left: 13px;
+    border-left: 2px solid var(--sage);
+  }
+
+  .picked em {
+    display: block;
+    margin-top: 2px;
+    font-style: normal;
+    font-size: 0.9rem;
+    color: var(--ink-soft);
+  }
+
+  /* ---------- closing ---------- */
+
+  .close-note {
+    margin-top: 16px;
+    padding-top: 32px;
+    border-top: 1px solid var(--rule);
+    text-align: center;
+  }
+
+  .close-note p {
+    margin: 0 auto;
+    max-width: 33ch;
+    color: var(--ink-soft);
+  }
+
+  .close-note strong {
+    display: block;
+    margin-top: 16px;
+    font-family: var(--display);
+    font-weight: 400;
+    font-size: 1.55rem;
+    color: var(--ink);
+  }
+
+  .orn { display: block; color: var(--sage); opacity: 0.75; }
+  .orn.top { margin: 30px 0 0; }
+  .orn.bottom { margin: 26px auto 0; }
+
+  /* ---------- motion ---------- */
+
+  @media (prefers-reduced-motion: no-preference) {
+    @supports (animation-timeline: view()) {
+      .stop, .close-note {
+        animation: lift linear both;
+        animation-timeline: view();
+        animation-range: entry 2% entry 46%;
+      }
+    }
+  }
+
+  @keyframes lift {
+    from { opacity: 0.34; transform: translateY(11px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .route, .pin-disc, .pin-num, .vibe, .step-btn { transition: none; }
+  }
+
+  @media (min-width: 600px) {
+    body { font-size: 17.5px; }
+    .atlas { margin-inline: 0; }
+    .plate-title, .stepper { margin-inline: 0; }
+    .stop { grid-template-columns: 56px 1fr; column-gap: 22px; }
+  }
+</style>
+
+<div class="grain" aria-hidden="true"></div>
+<div class="laid" aria-hidden="true"></div>
+
+<main class="page">
+
+  <header class="open">
+    <p class="eyebrow">For Willow</p>
+    <h1>If you came to Cincinnati</h1>
+    <p class="lede">This is the day I would plan. Six stops, one river crossing.</p>
+    <svg class="orn top" width="132" height="12" viewBox="0 0 132 12" fill="none" stroke="currentColor" stroke-width="1" aria-hidden="true">
+      <path d="M0 6h52M80 6h52"/>
+      <path d="M66 1.4l4.8 4.6-4.8 4.6-4.8-4.6z"/>
+    </svg>
+  </header>
+
+  <section class="atlas" aria-label="Map of the day">
+    <p class="plate-title">Cincinnati, six stops</p>
+
+    <svg class="map" viewBox="0 0 360 440" role="img" aria-labelledby="map-t">
+      <title id="map-t">A hand drawn map of Cincinnati in an old engraved style. Six numbered stops are linked in order by a dotted route that starts in Over-the-Rhine, runs east to Eden Park, comes back west for dinner, then crosses the Ohio River south into Kentucky. The sixth stop is marked only with a question mark.</title>
+
+      <defs>
+        <filter id="ink" x="-5%" y="-5%" width="110%" height="110%">
+          <feTurbulence type="fractalNoise" baseFrequency="0.024" numOctaves="2" seed="11" result="n"/>
+          <feDisplacementMap in="SourceGraphic" in2="n" scale="3.2" xChannelSelector="R" yChannelSelector="G"/>
+        </filter>
+        <path id="riverline" d="M8 290C70 306 128 290 190 300C244 309 298 314 352 300"/>
+      </defs>
+
+      <g class="land">
+        <path class="park-wash" d="M238 58C282 50 324 66 331 110C339 156 318 208 282 216C246 224 224 190 226 144C228 100 221 64 238 58Z"/>
+        <path class="park-edge" d="M238 58C282 50 324 66 331 110C339 156 318 208 282 216C246 224 224 190 226 144C228 100 221 64 238 58Z"/>
+        <path class="water-wash" d="M8 268C70 284 128 268 190 278C244 287 298 292 352 278L352 324C298 338 244 333 190 324C128 314 70 330 8 314Z"/>
+        <path class="ky-wash" d="M8 314C70 330 128 314 190 324C244 333 298 338 352 324L352 428L8 428Z"/>
+      </g>
+
+      <g filter="url(#ink)">
+        <g class="streets">
+          <path d="M82 52L102 262"/>
+          <path d="M100 68L118 212"/>
+          <path d="M118 50L138 258"/>
+          <path d="M136 72L154 206"/>
+          <path d="M154 54L172 262"/>
+          <path d="M190 58L208 264"/>
+          <path d="M226 62L244 266"/>
+          <path d="M262 66L278 268"/>
+          <path d="M300 76L310 196"/>
+          <path d="M62 104L286 93"/>
+          <path d="M58 142L306 130"/>
+          <path d="M64 180L312 168"/>
+          <path d="M70 216L318 204"/>
+          <path d="M76 252L268 243"/>
+          <path d="M38 348L186 341"/>
+          <path d="M44 380L204 372"/>
+          <path d="M56 408L210 402"/>
+          <path d="M96 330L110 428"/>
+          <path d="M152 334L164 428"/>
+        </g>
+
+        <g class="water">
+          <path d="M8 280C70 296 128 280 190 290C244 299 298 304 352 290" opacity="0.4"/>
+          <path d="M8 290C70 306 128 290 190 300C244 309 298 314 352 300" opacity="0.3"/>
+          <path d="M8 300C70 316 128 300 190 310C244 319 298 324 352 310" opacity="0.22"/>
+        </g>
+        <g class="bank">
+          <path d="M8 268C70 284 128 268 190 278C244 287 298 292 352 278"/>
+          <path d="M8 314C70 330 128 314 190 324C244 333 298 338 352 324"/>
+        </g>
+
+
+        <g class="furniture">
+          <path d="M224 264L224 330"/>
+          <path d="M228 264L228 330" opacity="0.5"/>
+          <path d="M218 282h16M218 312h16"/>
+        </g>
+
+        <g class="routes">
+          <path class="route" data-seg="1" d="M104 88C118 104 132 112 148 126"/>
+          <path class="route" data-seg="2" d="M148 126C190 116 240 112 286 108"/>
+          <path class="route" data-seg="3" d="M286 108C296 128 290 150 270 168"/>
+          <path class="route" data-seg="4" d="M270 168C214 182 140 176 96 154"/>
+          <path class="route" data-seg="5" d="M96 154C78 220 74 300 84 368"/>
+        </g>
+      </g>
+
+      <g class="frame">
+        <rect x="5" y="5" width="350" height="430"/>
+        <rect x="11" y="11" width="338" height="418"/>
+      </g>
+
+      <g class="labels">
+        <text class="mlabel" x="26" y="44">OVER-THE-RHINE</text>
+        <text class="mlabel minor" x="246" y="74">EDEN PARK</text>
+        <text class="mlabel minor" x="178" y="234">DOWNTOWN</text>
+        <text class="mlabel minor" x="112" y="352">COVINGTON</text>
+        <text class="mlabel tiny" x="212" y="358">KENTUCKY</text>
+        <text class="mlabel minor">
+          <textPath href="#riverline" startOffset="31%">OHIO RIVER</textPath>
+        </text>
+      </g>
+
+      <g class="compass">
+        <circle class="rose-ring" cx="304" cy="392" r="16"/>
+        <circle class="rose-ring" cx="304" cy="392" r="4.4"/>
+        <path class="rose" d="M304 374l3.6 15.4-3.6 3.6-3.6-3.6z"/>
+        <path class="rose" d="M304 410l3.6-15.4-3.6-3.6-3.6 3.6z" opacity="0.26"/>
+        <path class="rose" d="M286 392l15.4 3.6 3.6-3.6-3.6-3.6z" opacity="0.26"/>
+        <path class="rose" d="M322 392l-15.4 3.6-3.6-3.6 3.6-3.6z" opacity="0.26"/>
+        <text class="mlabel tiny" x="299" y="369">N</text>
+      </g>
+
+      <g class="scale">
+        <rect class="bar-on" x="36" y="426" width="28" height="5"/>
+        <rect class="bar-off" x="64" y="426" width="28" height="5"/>
+        <path class="bar-off" d="M36 423v11M92 423v11"/>
+        <text class="mlabel tiny" x="99" y="431">1 MI</text>
+      </g>
+
+      <g class="pin" role="button" tabindex="0" data-pin="1" aria-label="Stop 1, Findlay Market">
+        <circle class="pin-hit" cx="104" cy="88" r="24"/>
+        <circle class="pin-shadow" cx="106" cy="90" r="14"/>
+        <circle class="pin-ring" cx="104" cy="88" r="18"/>
+        <circle class="pin-disc" cx="104" cy="88" r="14"/>
+        <text class="pin-num" x="104" y="93">1</text>
+      </g>
+      <g class="pin" role="button" tabindex="0" data-pin="2" aria-label="Stop 2, lunch">
+        <circle class="pin-hit" cx="148" cy="126" r="24"/>
+        <circle class="pin-shadow" cx="150" cy="128" r="14"/>
+        <circle class="pin-ring" cx="148" cy="126" r="18"/>
+        <circle class="pin-disc" cx="148" cy="126" r="14"/>
+        <text class="pin-num" x="148" y="131">2</text>
+      </g>
+      <g class="pin" role="button" tabindex="0" data-pin="3" aria-label="Stop 3, Cincinnati Art Museum">
+        <circle class="pin-hit" cx="286" cy="108" r="24"/>
+        <circle class="pin-shadow" cx="288" cy="110" r="14"/>
+        <circle class="pin-ring" cx="286" cy="108" r="18"/>
+        <circle class="pin-disc" cx="286" cy="108" r="14"/>
+        <text class="pin-num" x="286" y="113">3</text>
+      </g>
+      <g class="pin" role="button" tabindex="0" data-pin="4" aria-label="Stop 4, Eden Park">
+        <circle class="pin-hit" cx="270" cy="168" r="24"/>
+        <circle class="pin-shadow" cx="272" cy="170" r="14"/>
+        <circle class="pin-ring" cx="270" cy="168" r="18"/>
+        <circle class="pin-disc" cx="270" cy="168" r="14"/>
+        <text class="pin-num" x="270" y="173">4</text>
+      </g>
+      <g class="pin" role="button" tabindex="0" data-pin="5" aria-label="Stop 5, dinner at Pepp and Dolores">
+        <circle class="pin-hit" cx="96" cy="154" r="24"/>
+        <circle class="pin-shadow" cx="98" cy="156" r="14"/>
+        <circle class="pin-ring" cx="96" cy="154" r="18"/>
+        <circle class="pin-disc" cx="96" cy="154" r="14"/>
+        <text class="pin-num" x="96" y="159">5</text>
+      </g>
+      <g class="pin mystery" role="button" tabindex="0" data-pin="6" aria-label="Stop 6, the last stop, across the river">
+        <circle class="pin-hit" cx="84" cy="368" r="24"/>
+        <circle class="pin-shadow" cx="86" cy="370" r="14"/>
+        <circle class="pin-ring" cx="84" cy="368" r="18"/>
+        <circle class="pin-disc" cx="84" cy="368" r="14"/>
+        <text class="pin-num" x="84" y="373">?</text>
+      </g>
+    </svg>
+
+    <div class="stepper">
+      <p class="cap-kicker" id="cap-kicker">Stop 1 &middot; Morning</p>
+      <h3 class="cap-title" id="cap-title">Findlay Market</h3>
+      <p class="cap-where" id="cap-where">Elm &amp; Elder, Over-the-Rhine</p>
+      <div class="nav">
+        <button class="step-btn back" type="button" id="back" disabled>&larr; Back</button>
+        <span class="counter" id="counter" aria-live="polite">1 / 6</span>
+        <button class="step-btn next" type="button" id="next">Next &rarr;</button>
+      </div>
+    </div>
+  </section>
+
+  <ol class="stops">
+
+    <li class="stop" id="stop-1">
+      <div class="rail"><div class="num">1</div><div class="thread"></div></div>
+      <div class="col">
+        <div class="head"><span class="when">Morning</span><span class="hr"></span></div>
+        <div class="titleline">
+          <h2>Findlay Market</h2>
+          <svg class="doodle" viewBox="0 0 40 40" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" role="img" aria-label="A drawing of a market stall awning">
+            <path d="M5 16h30"/>
+            <path d="M5 16l3-7h24l3 7"/>
+            <path d="M11 16l2-7M19 16l1-7M27 16l-1-7"/>
+            <path d="M8 16v18h24V16"/>
+            <path d="M8 34h24"/>
+            <path d="M14 34V24h12v10"/>
+          </svg>
+        </div>
+        <p class="note">Ohio's oldest public market, running since 1855. Coffee for me, tea for you, then we walk the stalls.</p>
+        <p class="spots">Deeper Roots Coffee &middot; Churchill's Fine Teas</p>
+      </div>
+    </li>
+
+    <li class="stop" id="stop-2">
+      <div class="rail"><div class="num">2</div><div class="thread"></div></div>
+      <div class="col">
+        <div class="head"><span class="when">Midday</span><span class="hr"></span></div>
+        <div class="titleline">
+          <h2>Lunch</h2>
+          <svg class="doodle" viewBox="0 0 40 40" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" role="img" aria-label="A drawing of a fork and a knife">
+            <path d="M12 7v9M16 7v9M20 7v9"/>
+            <path d="M12 16c0 2.6 1.8 4 4 4s4-1.4 4-4"/>
+            <path d="M16 20v13"/>
+            <path d="M28 7c3 4.5 3.4 9.5 2 14"/>
+            <path d="M28 7c-2.4 4.5-2.6 9.5-1.4 14"/>
+            <path d="M28.6 21l-.8 12"/>
+          </svg>
+        </div>
+        <p class="note">We stay in the neighborhood. You pick what you are in the mood for and I will sort out where.</p>
+        <div class="picker">
+          <p class="picker-label">What sounds good</p>
+          <div class="vibes" role="group" aria-label="Pick a lunch vibe">
+            <button class="vibe" type="button" aria-pressed="false" data-vibe="tacos">Tacos<span>Pata Roja</span></button>
+            <button class="vibe" type="button" aria-pressed="false" data-vibe="jerk">Jerk chicken<span>Jay's Nyam &amp; Jam</span></button>
+            <button class="vibe" type="button" aria-pressed="false" data-vibe="deli">Deli counter<span>Eckerlin Meats</span></button>
+            <button class="vibe" type="button" aria-pressed="false" data-vibe="light">Something light<span>Maplewood Kitchen</span></button>
+            <button class="vibe vibe-wide" type="button" aria-pressed="false" data-vibe="surprise">You decide<span>I will handle it</span></button>
+          </div>
+          <p class="picked" id="picked" hidden></p>
+        </div>
+      </div>
+    </li>
+
+    <li class="stop" id="stop-3">
+      <div class="rail"><div class="num">3</div><div class="thread"></div></div>
+      <div class="col">
+        <div class="head"><span class="when">Afternoon</span><span class="hr"></span></div>
+        <div class="titleline">
+          <h2>Cincinnati Art Museum</h2>
+          <svg class="doodle" viewBox="0 0 40 40" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" role="img" aria-label="A drawing of a painter's palette">
+            <path d="M20 7c7.5 0 13.5 5.2 13.5 11.4 0 3.8-2.8 5.2-5.6 5.2h-2.2c-2 0-3.4 1.2-3.4 3 0 1.6 1 2.2 1 3.6 0 1.4-1.4 2.4-3.3 2.4C12.4 32.6 6.5 26.8 6.5 19.4S12.5 7 20 7z"/>
+            <circle cx="14" cy="17.5" r="1.7"/>
+            <circle cx="20.5" cy="13.8" r="1.7"/>
+            <circle cx="26.8" cy="17" r="1.7"/>
+          </svg>
+        </div>
+        <p class="note">Free to walk in. We go at whatever pace you want.</p>
+        <p class="spots">953 Eden Park Drive</p>
+      </div>
+    </li>
+
+    <li class="stop" id="stop-4">
+      <div class="rail"><div class="num">4</div><div class="thread"></div></div>
+      <div class="col">
+        <div class="head"><span class="when">Late afternoon</span><span class="hr"></span></div>
+        <div class="titleline">
+          <h2>Eden Park</h2>
+          <svg class="doodle" viewBox="0 0 40 40" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" role="img" aria-label="A drawing of a leafy branch">
+            <path d="M19 6c-1.6 9 .2 19 2 28"/>
+            <path d="M20 12c2.8-2.6 6.4-2 8 .4-3 2.4-6.6 1.8-8-.4z"/>
+            <path d="M18.6 13.5c-3-2-6.4-1-7.6 1.6 3.2 1.8 6.6.8 7.6-1.6z"/>
+            <path d="M21 20c2.8-2.6 6.6-2.2 8.4.2-3.2 2.4-6.8 1.8-8.4-.2z"/>
+            <path d="M19.2 21.6c-3-2-6.6-1.2-8 1.4 3.4 1.8 7 .8 8-1.4z"/>
+            <path d="M22 28c2.6-2.4 6-2 7.6.2-3 2.2-6.2 1.6-7.6-.2z"/>
+          </svg>
+        </div>
+        <p class="note">The park sits on the bluff above the river. Krohn Conservatory is right there if we want twenty minutes indoors.</p>
+        <p class="spots">Krohn Conservatory &middot; Mirror Lake</p>
+      </div>
+    </li>
+
+    <li class="stop" id="stop-5">
+      <div class="rail"><div class="num">5</div><div class="thread"></div></div>
+      <div class="col">
+        <div class="head"><span class="when">Evening</span><span class="hr"></span></div>
+        <div class="titleline">
+          <h2>Pepp &amp; Dolores</h2>
+          <svg class="doodle" viewBox="0 0 40 40" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" role="img" aria-label="A drawing of a plate of pasta">
+            <ellipse cx="20" cy="23" rx="13.5" ry="8.4"/>
+            <ellipse cx="20" cy="22.6" rx="8.6" ry="5"/>
+            <path d="M13.4 21.6c2.4-2.6 4.6 1.6 7-.6 2.4-2.2 4.4 1.2 6.4-.8"/>
+            <path d="M14.6 24.8c2.6-2 4.2 1.6 6.6-.2 2.4-1.8 3.6 1 5.4-.6"/>
+          </svg>
+        </div>
+        <p class="note">Pasta made in house, back in Over-the-Rhine. The one reservation I am making.</p>
+        <p class="spots">1501 Vine Street</p>
+      </div>
+    </li>
+
+    <li class="stop" id="stop-6">
+      <div class="rail"><div class="num">6</div><div class="thread"></div></div>
+      <div class="col">
+        <div class="head"><span class="when">Golden hour</span><span class="hr"></span></div>
+        <div class="titleline">
+          <h2>A view you will have to see in person</h2>
+          <svg class="doodle" viewBox="0 0 40 40" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" role="img" aria-label="A drawing of a city skyline with a question mark above it">
+            <path d="M4 33h4.5V23H13v-5h4.5v8H21v-9h5v16h4.5V21H35v12"/>
+            <path d="M24.6 11.4c0-2 1.6-3.4 3.4-3.4 1.9 0 3.3 1.3 3.3 3 0 2.3-2.9 2.3-2.9 4.6"/>
+            <path d="M28.3 17.8v.2"/>
+          </svg>
+        </div>
+        <p class="note">Across the river, fifteen minutes out. I am not telling you more than that.</p>
+      </div>
+    </li>
+
+  </ol>
+
+  <footer class="close-note">
+    <p>None of this is locked. If you would rather cut it in half and sit somewhere for three hours, that is a better day anyway.</p>
+    <strong>Just say when.</strong>
+    <svg class="orn bottom" width="108" height="12" viewBox="0 0 108 12" fill="none" stroke="currentColor" stroke-width="1" aria-hidden="true">
+      <path d="M0 6h40M68 6h40"/>
+      <path d="M54 1.4l4.8 4.6-4.8 4.6-4.8-4.6z"/>
+    </svg>
+  </footer>
+
+</main>
+
+<script>
+  (function () {
+    var STOPS = [
+      { kicker: "Stop 1 · Morning", title: "Findlay Market", where: "Elm & Elder, Over-the-Rhine" },
+      { kicker: "Stop 2 · Midday", title: "Lunch", where: "Near the market, your pick" },
+      { kicker: "Stop 3 · Afternoon", title: "Cincinnati Art Museum", where: "953 Eden Park Drive" },
+      { kicker: "Stop 4 · Late afternoon", title: "Eden Park", where: "On the bluff above the river" },
+      { kicker: "Stop 5 · Evening", title: "Pepp & Dolores", where: "1501 Vine Street, Over-the-Rhine" },
+      { kicker: "Stop 6 · Golden hour", title: "The last stop", where: "Across the river, in Kentucky" }
+    ];
+
+    var pins = Array.prototype.slice.call(document.querySelectorAll(".pin"));
+    var segs = Array.prototype.slice.call(document.querySelectorAll(".route"));
+    var kicker = document.getElementById("cap-kicker");
+    var title = document.getElementById("cap-title");
+    var where = document.getElementById("cap-where");
+    var counter = document.getElementById("counter");
+    var back = document.getElementById("back");
+    var next = document.getElementById("next");
+    var current = 1;
+
+    function render(n) {
+      current = Math.min(STOPS.length, Math.max(1, n));
+      var s = STOPS[current - 1];
+      kicker.textContent = s.kicker;
+      title.textContent = s.title;
+      where.textContent = s.where;
+      counter.textContent = current + " / " + STOPS.length;
+      back.disabled = current === 1;
+      next.disabled = current === STOPS.length;
+
+      pins.forEach(function (p) {
+        p.classList.toggle("is-active", Number(p.dataset.pin) === current);
+      });
+      segs.forEach(function (seg) {
+        seg.classList.toggle("is-done", Number(seg.dataset.seg) < current);
+      });
+    }
+
+    pins.forEach(function (pin) {
+      function go(e) {
+        e.preventDefault();
+        render(Number(pin.dataset.pin));
+      }
+      pin.addEventListener("click", go);
+      pin.addEventListener("keydown", function (e) {
+        if (e.key === "Enter" || e.key === " ") go(e);
+      });
+    });
+
+    back.addEventListener("click", function () { render(current - 1); });
+    next.addEventListener("click", function () { render(current + 1); });
+
+    render(1);
+
+    var LINES = {
+      tacos: ["Tacos it is.", "Pata Roja. Mexico City style, out a walk up window."],
+      jerk: ["Jerk chicken.", "Jay's Nyam & Jam, right by the market."],
+      deli: ["The deli counter.", "Eckerlin Meats. A butcher at the market since 1852."],
+      light: ["Something light.", "Maplewood. Bowls, salads, big windows."],
+      surprise: ["I will pick.", "No hints."]
+    };
+
+    var out = document.getElementById("picked");
+    var vibes = Array.prototype.slice.call(document.querySelectorAll(".vibe"));
+
+    function show(key) {
+      var copy = LINES[key];
+      if (!copy) return;
+      vibes.forEach(function (v) {
+        v.setAttribute("aria-pressed", String(v.dataset.vibe === key));
+      });
+      out.textContent = copy[0];
+      var sub = document.createElement("em");
+      sub.textContent = copy[1];
+      out.appendChild(sub);
+      out.hidden = false;
+    }
+
+    vibes.forEach(function (v) {
+      v.addEventListener("click", function () {
+        show(v.dataset.vibe);
+        try { localStorage.setItem("willow-lunch", v.dataset.vibe); } catch (err) {}
+      });
+    });
+
+    try {
+      var saved = localStorage.getItem("willow-lunch");
+      if (saved && LINES[saved]) show(saved);
+    } catch (err) {}
+  })();
+</script>
